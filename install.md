@@ -23,3 +23,7 @@ undefined reference to `gLogCallsGL'
 undefined reference to `gCheckErrorGL'
 undefined reference to `GrGLInterface::checkError(char const*, char const*) const'
 
+
+CMake Path:
+SKIA_INCLUDE_DIR points to include directory
+SKIA_LIBRARY points to where libskia.a located
