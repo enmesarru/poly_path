@@ -236,7 +236,7 @@ int main(int argc, char** argv) {
 
         paint.setColor(SK_ColorWHITE);
         for (int i = 0; i < state.circles.count(); i++) {
-            paint.setColor(rand.nextU() | 0x44808080);
+            paint.setColor(rand.nextU() | 0x99202080);
 			auto [center, radius] = state.circles[i];
             canvas->drawCircle(center, radius, paint);
         }

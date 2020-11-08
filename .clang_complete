@@ -1,0 +1,3 @@
+-I/home/username/deps/skia
+-isystem /usr/include/freetype2 
+-isystem /usr/include/SDL2
