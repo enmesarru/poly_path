@@ -30,6 +30,7 @@ struct Circle {
 struct ApplicationState {
     ApplicationState() : fQuit(false) {}
     SkTArray<Circle> circles;
+	SkPoint pressedPosition;
     bool fQuit;
 };
 
@@ -46,11 +47,14 @@ static void handle_events(ApplicationState* state, SkCanvas* canvas) {
             case SDL_MOUSEMOTION:
                 if (event.motion.state == SDL_PRESSED) {
                     Circle& circle = state->circles.back();
-                    circle.radius = event.motion.x;
+					auto distance = SkPoint::Distance(state->pressedPosition, 
+						SkPoint::Make(SkIntToScalar(event.button.x), SkIntToScalar(event.button.y)));
+                    circle.radius = distance;
                 }
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 if (event.button.state == SDL_PRESSED) {
+					state->pressedPosition = SkPoint::Make(SkIntToScalar(event.button.x), SkIntToScalar(event.button.y));
 					Circle circle;
 					circle.center = SkPoint::Make(SkIntToScalar(event.button.x), SkIntToScalar(event.button.y));
 					state->circles.push_back() = circle;
@@ -227,7 +231,7 @@ int main(int argc, char** argv) {
     SkFont font;
     while (!state.fQuit) { // Our application loop
         SkRandom rand;
-        canvas->clear(SK_ColorBLACK);
+        canvas->clear(SK_ColorWHITE);
         handle_events(&state, canvas);
 
         paint.setColor(SK_ColorWHITE);
