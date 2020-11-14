@@ -1,5 +1,5 @@
 #include "include/gpu/GrBackendSurface.h"
-#include "SDL.h"
+#include <SDL2/SDL.h>
 #include "include/core/SkCanvas.h"
 #include "include/core/SkFont.h"
 #include "include/core/SkSurface.h"
@@ -31,6 +31,7 @@ struct ApplicationState {
     ApplicationState() : fQuit(false) {}
     SkTArray<Circle> circles;
 	SkPoint pressedPosition;
+	SkPoint lineEndPosition;
     bool fQuit;
 };
 
@@ -47,6 +48,9 @@ static void handle_events(ApplicationState* state, SkCanvas* canvas) {
             case SDL_MOUSEMOTION:
                 if (event.motion.state == SDL_PRESSED) {
                     Circle& circle = state->circles.back();
+					auto linePosition = SkPoint::Make(SkIntToScalar(event.button.x),
+						SkIntToScalar(event.button.y));
+					state->lineEndPosition = linePosition;
 					auto distance = SkPoint::Distance(state->pressedPosition, 
 						SkPoint::Make(SkIntToScalar(event.button.x), SkIntToScalar(event.button.y)));
                     circle.radius = distance;
@@ -131,7 +135,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    SDL_Window* window = SDL_CreateWindow("SDL Window", SDL_WINDOWPOS_CENTERED,
+    SDL_Window* window = SDL_CreateWindow("Path", SDL_WINDOWPOS_CENTERED,
                                           SDL_WINDOWPOS_CENTERED, dm.w, dm.h, windowFlags);
 
     if (!window) {
@@ -235,12 +239,19 @@ int main(int argc, char** argv) {
         handle_events(&state, canvas);
 
         paint.setColor(SK_ColorWHITE);
+		paint.setAntiAlias(true);
         for (int i = 0; i < state.circles.count(); i++) {
             paint.setColor(rand.nextU() | 0x99202080);
 			auto [center, radius] = state.circles[i];
             canvas->drawCircle(center, radius, paint);
+			paint.reset();
+			SkPath path;
+			path.moveTo(state.pressedPosition);
+			path.lineTo(state.lineEndPosition);
+			paint.setStrokeWidth(3);
+			paint.setStyle(SkPaint::kStrokeAndFill_Style);
+			canvas->drawPath(path, paint);
         }
-
         // draw offscreen canvas
         canvas->save();
         canvas->translate(dm.w / 2.0, dm.h / 2.0);
